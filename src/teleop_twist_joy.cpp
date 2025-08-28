@@ -142,8 +142,6 @@ double getVal(const sensor_msgs::Joy::ConstPtr& joy_msg, const std::map<std::str
 void TeleopTwistJoy::Impl::sendCmdVelMsg(const sensor_msgs::Joy::ConstPtr& joy_msg,
                                          const std::string& which_map)
 {
-  static double pre_x = 0.0;
-  static double pre_z = 0.0;
   // Initializes with zeros by default.
   geometry_msgs::Twist cmd_vel_msg;
 
@@ -156,21 +154,6 @@ void TeleopTwistJoy::Impl::sendCmdVelMsg(const sensor_msgs::Joy::ConstPtr& joy_m
 
   cmd_vel_msg.linear.x *= linear_direction;
   cmd_vel_msg.angular.z *= angular_direction;
-  if (cmd_vel_msg.linear.x < 0.0)
-  {
-    cmd_vel_msg.angular.z *= -1;
-    pre_x = cmd_vel_msg.linear.x;
-    pre_z = cmd_vel_msg.angular.z;
-  }
-  else if (pre_x < 0.0 && pre_z != 0.0 && cmd_vel_msg.linear.x == 0.0)
-  {
-    cmd_vel_msg.angular.z *= -1;
-  }
-  else
-  {
-    pre_x = cmd_vel_msg.linear.x;
-    pre_z = cmd_vel_msg.angular.z;
-  }
 
   cmd_vel_pub.publish(cmd_vel_msg);
 }
